@@ -15,10 +15,11 @@ import java.util.List;
  * Time: 6:48 PM
  */
 public final class Parser {
-    private List<FromItem> fromItemList;
+    private Table baseTable;
+    private List<JoinItem> joinItemList;
 
     public Parser(String sql) throws Exception {
-        fromItemList = new ArrayList<FromItem>();
+        joinItemList = new ArrayList<JoinItem>();
 
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         Select body = (Select) parserManager.parse(new StringReader(sql));
@@ -31,9 +32,9 @@ public final class Parser {
             table.setName(jsqlTbl.getName());
             table.setAlias(jsqlTbl.getAlias());
             table.setSchema(jsqlTbl.getSchemaName());
+            baseTable = table;
 
-            FromItem fromItem = new FromItem();
-            fromItem.setLeftTable(table);
+            JoinItem fromItem = new JoinItem();
 
             if (select.getJoins() != null && select.getJoins().size() > 0) {
                 Table rightTable = new Table();
@@ -43,14 +44,14 @@ public final class Parser {
                 rightTable.setAlias(rightJsqlTbl.getAlias());
                 rightTable.setSchema(rightJsqlTbl.getSchemaName());
 
-                fromItem.setRightTable(table);
+                fromItem.setTable(table);
             }
         }
 
     }
 
-    public List<FromItem> getFromItemList() {
-        return fromItemList;
+    public List<JoinItem> getJoinItemList() {
+        return joinItemList;
     }
 
 
